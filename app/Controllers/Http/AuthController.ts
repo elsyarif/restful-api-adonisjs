@@ -47,7 +47,7 @@ export default class AuthController {
 
     const jwt = await auth.use("jwt").login(user)
 
-    response.accepted({
+    response.ok({
       statusCode: 200,
       message: 'Login berhasil',
       data: jwt,
@@ -57,11 +57,17 @@ export default class AuthController {
   public async logout ({auth, response}: HttpContextContract){
     await auth.use('jwt').revoke()
 
-    response.accepted({
+    response.ok({
       message: 'Logout berhasil',
     })
   }
 
+  public async refresh({auth, request, response}: HttpContextContract){
+    const refreshToken = request.input("refresh_token")
+    Logger.info(refreshToken)
+
+    const jwt = await auth.use('jwt').loginViaRefreshToken(refreshToken)
+
+    response.accepted({data: jwt})
+  }
 }
-
-

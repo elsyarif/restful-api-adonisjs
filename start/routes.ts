@@ -19,17 +19,24 @@
 */
 
 import Route from '@ioc:Adonis/Core/Route'
+import {HttpContextContract} from "@ioc:Adonis/Core/HttpContext";
 
 Route.group(()=>{
   Route.post('/register', 'AuthController.register')
   Route.post( '/login', 'AuthController.login')
   Route.post( '/logout', 'AuthController.logout')
+  Route.post('/refresh', 'AuthController.refresh')
 
   Route.group(()=>{
-    Route.get('/test', async()=>{
+    Route.get('/test', async({auth}: HttpContextContract)=>{
+      await auth.use("jwt").authenticate();
+
+      console.log(auth.use('jwt').user!)
+
       return{
-        hello: 'authenticate'
+        hello: 'Login'
       }
     })
-  }).middleware('auth')
+  }).middleware('auth:jwt')
+
 }).prefix('/api')
